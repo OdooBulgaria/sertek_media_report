@@ -1,0 +1,56 @@
+<openerp>
+	<data>
+		<!-- Add one field in customers -->
+		 <record id="view_res_partner" model="ir.ui.view">
+            <field name="name">first.view.inheritance</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_form"/>
+            <field name="arch" type="xml">
+				<xpath expr="//field[@name='website']" position= "after">
+					<field name ="default_bonus" attrs = "{'invisible':[('customer','=',False)]}"/>
+				</xpath>
+			</field>
+		</record>
+		<!-- add one field in users -->
+		<record id="view_res_users" model="ir.ui.view">
+            <field name="name">first.view.inheritance</field>
+            <field name="model">res.users</field>
+            <field name="inherit_id" ref="base.view_users_form"/>
+            <field name="arch" type="xml">
+				<xpath expr="//field[@name='action_id']" position= "after">
+					<field name ="bonus"/>
+				</xpath>
+			</field>
+		</record>
+		
+		 <record id="view_res_users" model="ir.ui.view">
+            <field name="name">first.view.inheritance</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_order_form"/>
+            <field name="arch" type="xml">
+				<xpath expr="/form/sheet/notebook/page[@string='Order Lines']/field[@name='order_line']/tree/field[@name='discount']" position ='after'>
+					<field name ="cost"/>
+				</xpath>
+			</field>
+		</record>
+		
+		<record id="view_res_invoice" model="ir.ui.view">
+            <field name="name">first.view.inheritance</field>
+            <field name="model">account.invoice</field>
+            <field name="inherit_id" ref="account.invoice_form"/>
+            <field name="arch" type="xml">
+				<xpath expr="//notebook/page[@string='Other Info']" position ='after'>
+					<page string="pages">
+						<group>
+							<field name ="cost"/>
+							<field name ="profit"/>
+							<field name ="money_paid"/>
+						</group>	
+					</page>
+				</xpath>
+			</field>
+		</record> 
+		
+	
+</data>
+</openerp>
