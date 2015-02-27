@@ -12,7 +12,7 @@
 			</field>
 		</record>
 		<!-- add one field in users -->
-		<record id="view_res_users" model="ir.ui.view">
+		<record id="view_res_usersss" model="ir.ui.view">
             <field name="name">first.view.inheritance</field>
             <field name="model">res.users</field>
             <field name="inherit_id" ref="base.view_users_form"/>
@@ -34,7 +34,7 @@
 			</field>
 		</record>
 		
-		<record id="view_res_invoice" model="ir.ui.view">
+		<record id="view_res_invoices" model="ir.ui.view">
             <field name="name">first.view.inheritance</field>
             <field name="model">account.invoice</field>
             <field name="inherit_id" ref="account.invoice_form"/>
@@ -45,12 +45,52 @@
 							<field name ="cost"/>
 							<field name ="profit"/>
 							<field name ="money_paid"/>
+							<field name="bonus_cost"/>
 						</group>	
 					</page>
+						<page string="tree view">
+							<tree string="tree">
+								<field name ="cost"/>
+								<field name ="profit"/>
+								<field name ="money_paid"/>
+								<field name="bonus_cost"/>
+							</tree>
+						</page>
 				</xpath>
+			</field>
+		</record>
+		
+	
+		<record id="view_invoice_trees" model="ir.ui.view">
+            <field name="name">intellerist Tree View</field>
+            <field name="model">account.invoice</field>
+			<field name="type">tree</field>
+            <field name="arch" type="xml">
+				<tree string = "Intellerist Tree View">
+					<field name="number"/>
+					<field name ="cost"/>
+					<field name ="profit"/>
+					<field name ="money_paid"/>
+					<field name="bonus_cost"/>
+				</tree>
 			</field>
 		</record> 
 		
-	
+		 <record id="action_invoice_views_custom" model="ir.actions.act_window">
+            <field name="name">Action For invoice</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">account.invoice</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+        <record id="action_invoice_tree1_view1_new" model="ir.actions.act_window.view">
+            <field name="view_mode">tree</field>
+            <field name="act_window_id" ref="action_invoice_views_custom"/>
+        </record>
+        
+        <menuitem id="action_invoice_custom" name="Invoice Custom" parent="account.menu_finance_receivables" action="action_invoice_views_custom"/>
+		
+		
+		
 </data>
 </openerp>

@@ -39,9 +39,10 @@ class account_invoice(osv.osv):
              ''',(id,))
         
         result = cr.fetchall()
-        print"======================",result
+        print"======================+++++++++++++",result
         for i in ids:
-            res[i]=result[0][0]
+            if result:
+                res[i]=result[0][0]
         #print"===============",res[ids]["cost"][0][0]
         print"==============",res
         
@@ -86,14 +87,44 @@ class account_invoice(osv.osv):
                     credit_total = credit_total + j.credit
             res.update({i.id:credit_total})  
             credit_total = 0.0
-        return res      
+        return res 
+    
+    def _cal_bonus(self,cr,uid,ids,bonus_cost,args,context=None):
+        res={}
+        obj_invoice=self.browse(cr,uid,ids)
+        for j in obj_invoice:
+            customer=map(int,j.partner_id or [])
+            print"+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++customer",customer
+            userss=map(int,j.user_id or [])
+            #userss=j.user_id 
+            print"+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++user",userss
+        for k in customer: 
+            print"kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk",k
+            customer_obj=self.pool.get("res.partner").browse(cr,uid,k)
+        customer_bonus=customer_obj.default_bonus
+        print"customer=====================",customer,userss
+        for l in  userss: 
+            user_obj=self.pool.get("res.users").browse(cr,uid,l)
+        user_bonus=user_obj.bonus
+        if customer_bonus > user_bonus:
+            bonus=customer_bonus
+        else:
+             bonus=user_bonus
+        for i in ids:
+             res[i]=bonus
+        return res
+         
    
     _columns={
               "cost":fields.function(_cal_cost,type='float',string="Cost"),
               "profit":fields.function(_cal_profit,type="float",string="Profit"),
               "money_paid":fields.function(_cal_mony_paid,type="float",string="Money paid in that periods"),
+              "bonus_cost":fields.function(_cal_bonus,type="float",string="cost_bonus(%)"),
               }
     
-   
+    
+    
+
+  
     
 
