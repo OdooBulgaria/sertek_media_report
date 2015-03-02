@@ -16,14 +16,14 @@ class res_user(osv.osv):
               "bonus":fields.float("Bonus %"),
               }
 
-class sale_order_line(osv.osv):
+'''class sale_order_line(osv.osv):
     _inherit="sale.order.line"
     _defaults={}
     _description="sertek media module"
     _columns={
               "cost":fields.float("Cost"),
               }
-
+'''
 class account_invoice(osv.osv):
     _inherit="account.invoice"
     _defaults={}
@@ -62,7 +62,7 @@ class account_invoice(osv.osv):
     def _cal_profit(self,cr,uid,ids,profit,args,context=None):
         res={}
         for i in self.browse(cr,uid,ids):
-            profit=i.amount_untaxed-i.cost
+            profit=i.amount_untaxed-i.final_cost
             #res["profit"]=profit
         for j in ids:
             res[j]=profit

@@ -54,7 +54,7 @@
             <field name="inherit_id" ref="account.invoice_tree"/>
             <field name="arch" type="xml">
 				<xpath expr="//field[@name='date_invoice']" position='after'>
-					<field name ="cost"/>
+					<field name ="final_cost"/>
 					<field name ="profit"/>
 					<field name ="money_paid"/>
 					<field name="bonus_cost"/>
@@ -70,7 +70,7 @@
 				<xpath expr="//notebook/page[@string='Other Info']" position ='after'>
 					<page string="pages">
 						<group>
-							<field name ="cost"/>
+							<field name ="final_cost"/>
 							<field name ="profit"/>
 							<field name ="money_paid"/>
 							<field name="bonus_cost"/>
@@ -88,7 +88,7 @@
             <field name="arch" type="xml">
             	<search string="Search Invoice">
             		<field name="number"/>
-					<field name ="cost"/>
+					<field name ="final_cost"/>
 					<field name ="money_paid"/>
             		<group expand="0" string="Group By..."> 
                     <filter string="User" icon="terp-gtk-jump-to-rtl" domain="[]" context="{'group_by':'user_id'}"/> 
@@ -108,8 +108,9 @@
 					<field name="number"/>
 					<field name="state" invisible="1"/>
 					<field name="user_id"/>
+					<field name="partner_id"/>
 					<field name ="amount_untaxed"/>
-					<field name ="cost"/>
+					<field name ="final_cost"/>
 					<field name="amount_total"/>
 					<field name ="profit"/>
 					<field name ="money_paid"/>
