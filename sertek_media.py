@@ -39,12 +39,10 @@ class account_invoice(osv.osv):
              ''',(id,))
         
         result = cr.fetchall()
-        print"======================+++++++++++++",result
         for i in ids:
             if result:
                 res[i]=result[0][0]
         #print"===============",res[ids]["cost"][0][0]
-        print"==============",res
         
         return res
         #for i in cr.fetchall():
@@ -63,10 +61,8 @@ class account_invoice(osv.osv):
         
     def _cal_profit(self,cr,uid,ids,profit,args,context=None):
         res={}
-        print"==========================idssssssssss",ids
         for i in self.browse(cr,uid,ids):
             profit=i.amount_untaxed-i.cost
-            print"===============",profit
             #res["profit"]=profit
         for j in ids:
             res[j]=profit
@@ -75,7 +71,6 @@ class account_invoice(osv.osv):
     def _cal_mony_paid(self,cr,uid,ids,money_paid,args,context=None):
         res={}
         obj=self.pool.get("account.voucher")
-        print"===========================obj",obj._get_period(cr, uid, context=context)
         current_period=obj._get_period(cr, uid, context=context)
         credit_total=0.0
         for i in self.browse(cr,uid,ids):
@@ -94,15 +89,11 @@ class account_invoice(osv.osv):
         obj_invoice=self.browse(cr,uid,ids)
         for j in obj_invoice:
             customer=map(int,j.partner_id or [])
-            print"+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++customer",customer
             userss=map(int,j.user_id or [])
             #userss=j.user_id 
-            print"+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++user",userss
         for k in customer: 
-            print"kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk",k
             customer_obj=self.pool.get("res.partner").browse(cr,uid,k)
         customer_bonus=customer_obj.default_bonus
-        print"customer=====================",customer,userss
         for l in  userss: 
             user_obj=self.pool.get("res.users").browse(cr,uid,l)
         user_bonus=user_obj.bonus
