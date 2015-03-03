@@ -29,7 +29,7 @@
             <field name="inherit_id" ref="sale.view_order_form"/>
             <field name="arch" type="xml">
 				<xpath expr="/form/sheet/notebook/page[@string='Order Lines']/field[@name='order_line']/tree/field[@name='discount']" position ='after'>
-					<field name ="cost"/>
+					<field name ="final_cost"/>
 				</xpath>
 			</field>
 		</record>
@@ -62,7 +62,7 @@
 			</field>
 		</record>
 		
-		<record id="view_res_invoices" model="ir.ui.view">
+	 	<record id="view_res_invoices" model="ir.ui.view">
             <field name="name">first.view.inheritance</field>
             <field name="model">account.invoice</field>
             <field name="inherit_id" ref="account.invoice_form"/>
@@ -78,7 +78,7 @@
 					</page>
 				</xpath>
 			</field>
-		</record>
+		</record> 
 		
 		
 		 <record id="view_account_invoice_search1" model="ir.ui.view">
@@ -90,9 +90,9 @@
             		<field name="number"/>
 					<field name ="final_cost"/>
 					<field name ="money_paid"/>
-            		<group expand="0" string="Group By..."> 
-                    <filter string="User" icon="terp-gtk-jump-to-rtl" domain="[]" context="{'group_by':'user_id'}"/> 
-                     <filter string="Period" icon="terp-gtk-jump-to-rtl" domain="[]" context="{'group_by':'period_id'}"/> 
+            		<group expand="0" string="Group By...">
+            		<filter string="Period" name="period" icon="terp-gtk-jump-to-rtl" domain="[]" context="{'group_by':'period_id'}"/>  
+                    <filter string="User" name="user" icon="terp-gtk-jump-to-rtl" domain="[]" context="{'group_by':'user_id'}"/> 
                     </group> 
             	</search>
             </field>
@@ -137,6 +137,7 @@
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">account.invoice</field>
             <field name="domain">[('type','=','out_invoice')]</field>
+            <field name="context">{'search_default_period':1,'search_default_user':1}</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
         </record>

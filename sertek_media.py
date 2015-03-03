@@ -16,33 +16,35 @@ class res_user(osv.osv):
               "bonus":fields.float("Bonus %"),
               }
 
-'''class sale_order_line(osv.osv):
+class sale_order_line(osv.osv):
     _inherit="sale.order.line"
-    _defaults={}
+    _defaults={
+               'final_cost':10.0,
+               }
     _description="sertek media module"
     _columns={
-              "cost":fields.float("Cost"),
+              "final_cost":fields.float("Final Unit Cost"),
               }
-'''
+
 class account_invoice(osv.osv):
     _inherit="account.invoice"
     _defaults={}
     _description="sertek media module"
     
-    def _cal_cost(self,cr,uid,ids,cost,args,context=None):
+    def _cal_cost(self,cr,uid,ids,final_cost,args,context=None):
         res={}
         id=tuple(self.pool.get('account.invoice.line').search(cr,uid,[('invoice_id','in',ids)]))
         #print " select order_line_id from sale_order_line_invoice_rel where invoice_id in %s" %(id)
         if id:
             cr.execute('''
-             select sum(sl.cost) from sale_order_line_invoice_rel as rel join sale_order_line as sl on rel.order_line_id = sl.id  where rel.invoice_id in %s 
+             select sum(sl.final_cost) from sale_order_line_invoice_rel as rel join sale_order_line as sl on rel.order_line_id = sl.id  where rel.invoice_id in %s 
              ''',(id,))
         
         result = cr.fetchall()
         for i in ids:
             if result:
                 res[i]=result[0][0]
-        #print"===============",res[ids]["cost"][0][0]
+        #print"===============",res[ids]["final_cost"][0][0]
         
         return res
         #for i in cr.fetchall():
@@ -55,7 +57,7 @@ class account_invoice(osv.osv):
             #    ids=map(int,i.invoice_line or [])
              #   print ids
                
-            #res["cost"]=100
+            #res["final_cost"]=100
             #print"resssssssssssssssssss",res
         #return {"value":res}
         
@@ -107,7 +109,7 @@ class account_invoice(osv.osv):
          
    
     _columns={
-              "cost":fields.function(_cal_cost,type='float',string="Cost"),
+              "final_cost":fields.function(_cal_cost,type='float',string="Final Unit Cost"),
               "profit":fields.function(_cal_profit,type="float",string="Profit"),
               "money_paid":fields.function(_cal_mony_paid,type="float",string="Money paid in that periods"),
               "bonus_cost":fields.function(_cal_bonus,type="float",string="cost_bonus(%)"),
