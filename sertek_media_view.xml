@@ -1,7 +1,7 @@
 <openerp>
 	<data>
 		<!-- Add one field in customers -->
-		 <record id="view_res_partner" model="ir.ui.view">
+		<record id="view_res_partner" model="ir.ui.view">
             <field name="name">first.view.inheritance</field>
             <field name="model">res.partner</field>
             <field name="inherit_id" ref="base.view_partner_form"/>
@@ -11,6 +11,7 @@
 				</xpath>
 			</field>
 		</record>
+		
 		<!-- add one field in users -->
 		<record id="view_res_usersss" model="ir.ui.view">
             <field name="name">first.view.inheritance</field>
@@ -34,19 +35,6 @@
 			</field>
 		</record>
 		
-		<!--  <record id="view_invoice_form" model="ir.ui.view">
-            <field name="name">invoice tree</field>
-            <field name="model">account.invoice</field>
-            <field name="inherit_id" ref="account.view_account_invoice_filter"/>
-            <field name="arch" type="xml">
-            	<search string="Search Invoice">
-            		<group expand="0" string="Group By"> 
-                   		<filter string="user" icon="terp-gtk-jump-to-rtl" domain="[]" context="{'group_by':'user_id'}"/> 
-                    	<filter string="Profit" icon="terp-gtk-jump-to-rtl" domain="[]" context="{'group_by':'profit'}"/> 
-                    </group> 
-            	</search>
-            </field>
-         </record> -->
 		
 		<record id="view_res_invoicesss" model="ir.ui.view">
             <field name="name">first.view.inheritance</field>
@@ -90,10 +78,6 @@
             		<field name="number"/>
 					<field name ="final_cost"/>
 					<field name ="money_paid"/>
-            		<group expand="0" string="Group By...">
-            		<filter string="Period" name="period" icon="terp-gtk-jump-to-rtl" domain="[]" context="{'group_by':'period_id'}"/>  
-                    <filter string="User" name="user" icon="terp-gtk-jump-to-rtl" domain="[]" context="{'group_by':'user_id'}"/> 
-                    </group> 
             	</search>
             </field>
          </record>
@@ -114,10 +98,23 @@
 					<field name="amount_total"/>
 					<field name ="profit"/>
 					<field name ="money_paid"/>
+					<field name = "bonus_cost" string = "Bonus %"/>
+					<field name = "comision_employee"/>
 				</tree>
 			</field>
 		</record> 
 		
+		<record id="action_invoice_views_custom" model="ir.actions.act_window">
+	         <field name="name">Employee Commission</field>
+	         <field name="type">ir.actions.act_window</field>
+	         <field name="res_model">account.invoice</field>
+	         <field name="domain">[('type','=','out_invoice')]</field>
+	         <field name = "context">{'group_by':['period_id','user_id']}</field>
+	         <!--  <field name="context">{'search_default_period':1,'search_default_user':1}</field> -->
+	         <field name="view_type">form</field>
+	         <field name="view_mode">tree,form</field>
+	   </record>
+
 		 <record id="action_invoice_tree_view1" model="ir.actions.act_window.view">
             <field eval="1" name="sequence"/>
             <field name="view_mode">tree</field>
@@ -131,16 +128,7 @@
             <field name="view_id" ref="account.invoice_form"/>
             <field name="act_window_id" ref="action_invoice_views_custom"/>
         </record>
-		
-		 <record id="action_invoice_views_custom" model="ir.actions.act_window">
-            <field name="name">Action For invoice</field>
-            <field name="type">ir.actions.act_window</field>
-            <field name="res_model">account.invoice</field>
-            <field name="domain">[('type','=','out_invoice')]</field>
-            <field name="context">{'search_default_period':1,'search_default_user':1}</field>
-            <field name="view_type">form</field>
-            <field name="view_mode">tree,form</field>
-        </record>
-        <menuitem id="action_invoice_custom1" name="Invoice Custom" parent="account.menu_finance_receivables" action="action_invoice_views_custom"/>
+        
+        <menuitem id="action_invoice_custom1" name="Employee Commission" parent="account.menu_finance_reports" action="action_invoice_views_custom"/>
 </data>
 </openerp>

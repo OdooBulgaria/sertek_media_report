@@ -29,7 +29,7 @@
     'website': '',
     'images' : [], #'/images/image_name.png'
     'depends' : ['base','hr','crm','sale',],#account_analytic_analysis
-    'data': ['sertek_media_view.xml',
+    'data': ['sertek_media_view.xml', 'views/javascript.xml'
     ],
 
     'qweb' : [
