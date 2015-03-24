@@ -194,10 +194,10 @@ openerp.sertek_media_report = function(instance) {
 	            	}
 	            	if (group.previous_total != undefined){
 		            	$row_child.append($("<td align = 'right' class = 'oe_readonly' >Previous Period Payments</td>"))
-		            	$row_child.append($("<td style = 'border-right:2px solid;border-left:2px solid;border-bottom:2px solid;border-top:2px solid' class = 'oe_list_field_cell oe_list_field_float oe_number  oe_readonly'  >"+group.previous_total+"</td>" ))
+		            	$row_child.append($("<td style = 'border-right:2px solid;border-left:2px solid;border-bottom:2px solid;border-top:2px solid' class = 'oe_list_field_cell oe_list_field_float oe_number  oe_readonly'  ><font color='green'>"+group.previous_total+"</font></td>" ))
 		            	$row_child.append($("<td align = 'right' class = 'oe_readonly' >Commision(15%)</td>"))
 		            	comision  = 0.15 * group.previous_total ;
-		            	$row_child.append($("<td style = 'border-right:2px solid;border-left:2px solid;border-bottom:2px solid;border-top:2px solid' class = 'oe_list_field_cell oe_list_field_float oe_number  oe_readonly'  >"+comision+"</td>" ))
+		            	$row_child.append($("<td style = 'border-right:2px solid;border-left:2px solid;border-bottom:2px solid;border-top:2px solid' class = 'oe_list_field_cell oe_list_field_float oe_number  oe_readonly'  ><font color='green'>"+comision+"</font></td>" ))
 		            	placeholder.appendChild($row_child[0]);	            	            		
 	            	}
 	            }	            
