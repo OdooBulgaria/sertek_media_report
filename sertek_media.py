@@ -34,25 +34,26 @@ class account_invoice(osv.osv):
     def fetch_previous_period_total(self,cr,uid,period_id,context=None):
         result = {}
         for group in period_id:
-            cr.execute('''
-            select id,date_start from account_period 
-            where date_start < (select date_start from account_period where id = %s) and  special = false  order by date_start desc limit 1 
-            ''' % (group))
-            period = cr.fetchall()
-            if period:
+            if group:
                 cr.execute('''
-                select sum(b.credit) as credit from account_move_reconcile as a 
-                left join account_move_line as b on a.id = b.reconcile_id or b.reconcile_partial_id = a.id 
-                where a.id in (select account_move_reconcile.id as reconcile from account_invoice 
-                left join account_move on account_invoice.move_id = account_move.id 
-                left join account_move_line on account_move.id = account_move_line.move_id 
-                left join account_move_reconcile on account_move_line.reconcile_id = account_move_reconcile.id 
-                or account_move_line.reconcile_partial_id = account_move_reconcile.id 
-                where account_invoice.period_id = %s and account_move_reconcile.id is not null) 
-                and b.period_id = %s
-                ''' %(period[0][0],group))
-                total = cr.fetchone();
-                result.update({group:total[0] or 0})
+                select id,date_start from account_period 
+                where date_start < (select date_start from account_period where id = %s) and  special = false  order by date_start desc limit 1 
+                ''' % (group))
+                period = cr.fetchall()
+                if period:
+                    cr.execute('''
+                    select sum(b.credit) as credit from account_move_reconcile as a 
+                    left join account_move_line as b on a.id = b.reconcile_id or b.reconcile_partial_id = a.id 
+                    where a.id in (select account_move_reconcile.id as reconcile from account_invoice 
+                    left join account_move on account_invoice.move_id = account_move.id 
+                    left join account_move_line on account_move.id = account_move_line.move_id 
+                    left join account_move_reconcile on account_move_line.reconcile_id = account_move_reconcile.id 
+                    or account_move_line.reconcile_partial_id = account_move_reconcile.id 
+                    where account_invoice.period_id = %s and account_move_reconcile.id is not null) 
+                    and b.period_id = %s
+                    ''' %(period[0][0],group))
+                    total = cr.fetchone();
+                    result.update({group:total[0] or 0})
         return result
             
     def fetch_previous_period(self,cr,uid,groups,context=None):
