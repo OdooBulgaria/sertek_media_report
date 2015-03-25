@@ -91,7 +91,6 @@ class account_invoice(osv.osv):
             cr.execute('''
              select sum(sl.final_cost) from sale_order_line_invoice_rel as rel join sale_order_line as sl on rel.order_line_id = sl.id  where rel.invoice_id in %s 
              ''',(id,))
-        
         result = cr.fetchall()
         for i in ids:
             if result:
@@ -102,16 +101,22 @@ class account_invoice(osv.osv):
         res = {}
         for i in self.browse(cr,uid,ids,context):
             total = 0
-            total = ((i.money_paid - i.amount_total + i.profit) * i.bonus_cost)/100
+            cr.execute('''
+            select bonus_cost from account_invoice where id = %s
+            '''%(i.id))
+            bonus_cost = cr.fetchone()[0] or 0.00
+            total = ((i.money_paid - i.amount_total + i.profit) * bonus_cost)/100
             res[i.id] = total
         return res
     
     def _cal_profit(self,cr,uid,ids,profit,args,context=None):
         res={}
         for i in self.browse(cr,uid,ids):
+            profit = 0
             profit=i.amount_untaxed-i.final_cost
-        for j in ids:
-            res[j]=profit
+            res[i.id] = profit
+#         for j in ids:
+#             res[j]=profit
         return res
     
     def _cal_mony_paid(self,cr,uid,ids,money_paid,args,context=None):
@@ -129,31 +134,73 @@ class account_invoice(osv.osv):
     
     def _cal_bonus(self,cr,uid,ids,bonus_cost,args,context=None):
         res={}
-        obj_invoice=self.browse(cr,uid,ids)
-        for j in obj_invoice:
-            customer=map(int,j.partner_id or [])
-            userss=map(int,j.user_id or [])
-        for k in customer: 
-            customer_obj=self.pool.get("res.partner").browse(cr,uid,k)
-        customer_bonus=customer_obj.default_bonus
-        for l in  userss: 
-            user_obj=self.pool.get("res.users").browse(cr,uid,l)
-        user_bonus=user_obj.bonus
-        if customer_bonus > user_bonus:
-            bonus=customer_bonus
-        else:
-             bonus=user_bonus
-        for i in ids:
-             res[i]=bonus
+        for i in self.browse(cr,uid,ids,context):
+            if i.partner_id and i.partner_id.default_bonus > 0:
+                res[i.id] = i.partner_id.default_bonus
+            elif i.user_id and i.user_id.bonus > 0:
+                res[i.id] = i.user_id.bonus
+            else:
+                res[i.id] = 0
+#         for j in obj_invoice:
+#             customer=map(int,j.partner_id or [])
+#             userss=map(int,j.user_id or [])
+#         for k in customer: 
+#             customer_obj=self.pool.get("res.partner").browse(cr,uid,k)
+#         customer_bonus=customer_obj.default_bonus
+#         for l in  userss: 
+#             user_obj=self.pool.get("res.users").browse(cr,uid,l)
+#         user_bonus=user_obj.bonus
+#         if customer_bonus > user_bonus:
+#             bonus=customer_bonus
+#         else:
+#              bonus=user_bonus
+#         for i in ids:
+#              res[i]=bonus
         return res
-         
+    
+    def _get_users(self, cr, uid, ids, context=None):
+        result = []
+        for id in ids:
+            cr.execute('''select id from account_invoice where user_id = %s and type = 'out_invoice' 
+            ''' %(id))
+            invoice = cr.fetchall()
+            for i in invoice:
+                result.append(i[0])
+        return result
+
+    
+    def _get_partner(self, cr, uid, ids, context=None):
+        result = []
+        for id in ids:
+            cr.execute('''select id from account_invoice where partner_id = %s and type = 'out_invoice' 
+            ''' %(id))
+            invoice = cr.fetchall()
+            for i in invoice:
+                result.append(i[0])
+        return result
+
+    def _get_invoice(self, cr, uid, ids, context=None):
+        result = {}
+        for line in self.pool.get('account.invoice.line').browse(cr, uid, ids, context=context):
+            result[line.invoice_id.id] = True
+        return result.keys()
    
     _columns={
               "final_cost":fields.function(_cal_cost,type='float',string="Cost of Invoice"),
               "profit":fields.function(_cal_profit,type="float",string="Profit"),
               "money_paid":fields.function(_cal_mony_paid,type="float",string="Money paid in that period"),
-              "bonus_cost":fields.function(_cal_bonus,type="float",string="Bonus (%)"),
-              "comision_employee":fields.function(_compute_comision,store = True ,type = 'float',string = "Employee Commision")
+              "bonus_cost":fields.function(_cal_bonus,type="float",string="Bonus (%)",
+               store={
+                    'res.partner': (_get_partner, ['default_bonus'], 0),
+                    'res.users': (_get_users,['bonus'], 0)
+                }),
+              "comision_employee":fields.function(_compute_comision,type = 'float',string = "Employee Commision",
+                   store={
+                        'res.partner': (_get_partner, ['default_bonus'], 10),
+                        'res.users': (_get_users,['bonus'], 10),
+                        'account.invoice': (lambda self, cr, uid, ids, c={}: ids, ['invoice_line'], 10),
+                       'account.invoice.line': (_get_invoice, ['price_unit', 'invoice_line_tax_id', 'discount', 'quantity'], 10),
+                    }),
               }
     
     

@@ -174,7 +174,11 @@ openerp.sertek_media_report = function(instance) {
 	                	}	 
 	                	else if (column.meta) {
 	                        // do not do anything
-	                    } else if (column.id in group.aggregates) {
+	                    } 
+	                	else if (column.id == "bonus_cost"){
+	                        $row.append('<td>');
+	                	}
+	                	else if (column.id in group.aggregates) {
 	                        var r = {};
 	                        r[column.id] = {value: group.aggregates[column.id]};
 	                        $('<td class="oe_number">')
