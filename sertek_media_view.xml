@@ -56,7 +56,7 @@
             <field name="inherit_id" ref="account.invoice_form"/>
             <field name="arch" type="xml">
 				<xpath expr="//notebook/page[@string='Other Info']" position ='after'>
-					<page string="pages">
+					<page string="Analytics">
 						<group>
 							<field name ="final_cost"/>
 							<field name ="profit"/>

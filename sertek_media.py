@@ -27,10 +27,21 @@ class sale_order_line(osv.osv):
               "final_cost":fields.float("Final Unit Cost"),
               }
 
+
+
 class account_invoice(osv.osv):
     _inherit="account.invoice"
-    _defaults={}
     _description="sertek media module"
+    
+    def _get_period_id(self, cr, uid, context=None):
+        obj=self.pool.get("account.voucher")
+        current_period=obj._get_period(cr, uid, context=context)
+        return current_period        
+
+    _defaults={
+               'period_id':_get_period_id
+               }
+    
     def fetch_previous_period_total(self,cr,uid,period_id,context=None):
         result = {}
         for group in period_id:
@@ -121,12 +132,12 @@ class account_invoice(osv.osv):
     
     def _cal_mony_paid(self,cr,uid,ids,money_paid,args,context=None):
         res={}
-        obj=self.pool.get("account.voucher")
-        current_period=obj._get_period(cr, uid, context=context)
+#         obj=self.pool.get("account.voucher")
+#         current_period=obj._get_period(cr, uid, context=context)
         credit_total=0.0
         for i in self.browse(cr,uid,ids):
             for j in i.payment_ids:
-                if j.period_id.id == current_period:
+                if j.period_id.id == i.period_id.id:
                     credit_total = credit_total + j.credit
             res.update({i.id:credit_total})  
             credit_total = 0.0
@@ -141,21 +152,6 @@ class account_invoice(osv.osv):
                 res[i.id] = i.user_id.bonus
             else:
                 res[i.id] = 0
-#         for j in obj_invoice:
-#             customer=map(int,j.partner_id or [])
-#             userss=map(int,j.user_id or [])
-#         for k in customer: 
-#             customer_obj=self.pool.get("res.partner").browse(cr,uid,k)
-#         customer_bonus=customer_obj.default_bonus
-#         for l in  userss: 
-#             user_obj=self.pool.get("res.users").browse(cr,uid,l)
-#         user_bonus=user_obj.bonus
-#         if customer_bonus > user_bonus:
-#             bonus=customer_bonus
-#         else:
-#              bonus=user_bonus
-#         for i in ids:
-#              res[i]=bonus
         return res
     
     def _get_users(self, cr, uid, ids, context=None):
@@ -192,7 +188,9 @@ class account_invoice(osv.osv):
               "bonus_cost":fields.function(_cal_bonus,type="float",string="Bonus (%)",
                store={
                     'res.partner': (_get_partner, ['default_bonus'], 0),
-                    'res.users': (_get_users,['bonus'], 0)
+                    'res.users': (_get_users,['bonus'], 0),
+                    'account.invoice': (lambda self, cr, uid, ids, c={}: ids, ['invoice_line'], 0),
+                    'account.invoice.line': (_get_invoice, ['price_unit', 'invoice_line_tax_id', 'discount', 'quantity'], 0),                      
                 }),
               "comision_employee":fields.function(_compute_comision,type = 'float',string = "Employee Commision",
                    store={
