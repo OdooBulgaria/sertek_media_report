@@ -96,16 +96,13 @@ class account_invoice(osv.osv):
     
     def _cal_cost(self,cr,uid,ids,final_cost,args,context=None):
         res={}
-        id=tuple(self.pool.get('account.invoice.line').search(cr,uid,[('invoice_id','in',ids)]))
-        #print " select order_line_id from sale_order_line_invoice_rel where invoice_id in %s" %(id)
-        if id:
+        for id in ids:
+            move_ids=tuple(self.pool.get('account.invoice.line').search(cr,uid,[('invoice_id','=',id)]))
             cr.execute('''
              select sum(sl.final_cost) from sale_order_line_invoice_rel as rel join sale_order_line as sl on rel.order_line_id = sl.id  where rel.invoice_id in %s 
-             ''',(id,))
-        result = cr.fetchall()
-        for i in ids:
-            if result:
-                res[i]=result[0][0]
+             ''',(move_ids,))
+            result = cr.fetchall()
+            res[id]=result[0][0] or 0.0
         return res
         
     def _compute_comision(self,cr,uid,ids,field,args,context=None):
@@ -126,8 +123,6 @@ class account_invoice(osv.osv):
             profit = 0
             profit=i.amount_untaxed-i.final_cost
             res[i.id] = profit
-#         for j in ids:
-#             res[j]=profit
         return res
     
     def _cal_mony_paid(self,cr,uid,ids,money_paid,args,context=None):
